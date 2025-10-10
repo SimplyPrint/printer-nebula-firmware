@@ -1,67 +1,61 @@
-# Custom Firmware
+# SimplyPrint Nebula Smart Kit Firmware
+> [!NOTE]
+> This script is heavily based on ![pellcorps's script](https://github.com/pellcorp/creality/tree/main/firmware) and ![koen1's script](https://github.com/koen01/nebula_firmware)
 
-A script to create custom firmware providing firmware for the k1 that has been pre-rooted, ssh-enabled and 
-my emergency firmware factory reset feature installed.  This is very minimal changes on top of the default
-firmware it is not to compete with the pre-rooted firmware from Destinal which includes Moonraker, Fluidd, etc
+This project automates fetching the latest Creality Nebula firmware, rooting it, and repacking it into a new image.
 
-**I WILL NOT BE HELD RESPONSIBLE IF YOU BRICK YOUR PRINTER - CREATING AND INSTALLING CUSTOM FIRMWARE IS RISKY**
+## Overview
+`create.sh` downloads the official Creality Nebula firmware, extracts it, and repacks a rooted version with the following modifications:
+- Enables ssh/root access and injects a new root password
+- Adds the `/root/installer.sh` script that installs and runs the ![Creality Helper Script](https://github.com/Guilouz/Creality-Helper-Script) for installing Klipper, SimplyPrint, and other related tools.
+- Adds a factory reset option by checking if a file named `factory_reset` exists on the USB stick
 
-## Why I did it?
+## Firmware installation
+1. Download the latest `NEBULA_ota_img_V6.*.img` file from the ![latest release](https://github.com/SimplyPrint/printer-nebula-firmware/releases/latest)
+2. Transfer it to the USB stick that came with the Nebula
+3. Insert it into the Nebula and press the ***Upgrade*** button, once the firmware upgrade pop-up appears, and wait for the installation to finish
+4. Go into ***Settings*** -> ***Network*** and find the Nebula's IP address
+5. Connect to the Nebula over ssh (default: `root@creality`)
+6. Run the installer script by running `./installer.sh`
+7. Choose `1) [Install] Menu` once the script has launched and install the following:
+    - `1) Moonraker and Nginx`
+    - `2) Fluidd (port 4408)` or `3) Mainsail (port 4409)`
+    - `5) Klipper Gcode Shell Command`
+    - `10) Nebula Camera Settings Control`
+    - `11) USB Camera Support`
+    - `17) SimplyPrint`
+8. Enable the webcam for moonraker by navigating to `5) [Tools] Menu` in the main menu, and choose `3) Enable camera settings in Moonraker`
+9. Open a browser and navigate to `http://[YOUR IP]:[Fluidd/Mainsail port]`, fx. `http://192.168.0.42:4409`, to open the Mainsail or Fluidd instance
 
-I mostly did this so I could iterate my Simple AF K1 Klipper project, because factory resetting, configuring WIFI,
- then enabling root takes at least 1 minute.   With my `S58factoryreset` process it leaves the wifi configuration
- alone.
+### Factory reset
+> [!WARNING]
+> Performing a factory reset will permanently delete all user-installed software, custom configurations, and most stored data.
+> Only your Wi-Fi settings, printer identity, and essential system configuration files will be preserved.
 
- I was considering packaging my Simple AF K1 Klipper as a firmware image, but I actually don't think that is such
- a good idea, as all you can do is create a `/etc/init.d` file that gets triggered on startup to actually
- do the install, and the user has no idea whether it succeeded or not!
+1. Add an empty file named `factory_reset` (no file extension) to the USB stick
+2. Turn off the Nebula, insert the USB stick, and turn it on again
+3. Wait until the Nebula has booted up completely
 
-## Prerequisites
+The upgrade pop-up will show up, if the rooted firmware is present on the USB stick, which indicates a successful factory reset.
 
-You will need a linux machine with the following commands available, something like ubuntu or arch is fine:
-
-- p7zip (7z command)
-- wget
-- unsquashfs
-- mksquashfs
-- mkpasswd
-
-The packages on ubuntu can be installed like so:
-
+## Usage
+### Required packages
 ```
-sudo apt-get install p7zip squashfs-tools wget whois
+7z
+wget
+mksquashfs
+unsquashfs
+openssl (or mkpasswd)
 ```
-
-Don't try and create this on windows or MacOs, you could do it on a ubuntu vm no problem
-
-## Creating
-
-Then you can create a new firmware file, currently without any customations just to test things work with:
-
-```
-./create.sh
-```
-
-**NOTE:** You will be required to enter your `sudo` password
-
-The resulting img file will be located at `/tmp/1.3.3.8-pellcorp/CR4CU220812S11_ota_img_V6.1.3.3.8.img`
-
-## Testing
-
-It's very important to test this in the safest way possible, luckily creality has provided a way to test
-a new firmware image from the cli rather than relying on the display server
-
-```
-/etc/ota_bin/local_ota_update.sh /tmp/udisk/sda1/CR4CU220812S11_ota_img_V6.1.3.3.8.img
-```
-
-## Thanks
-
-Thanks for destinal from discord for providing information about testing the image and also for providing 
-the password creality uses for generating the image.
-
-https://www.reddit.com/r/crealityk1/comments/15d3b8k/reverting_to_stock_firmware_on_the_k1_or_k1_max/  
-
-
-I also have used a couple of his init.d scripts which I got from 
-https://openk1.org/static/k1/packages/crealityos-root-init-scripts.tar.gz
+### Running the script
+1. Clone or download the repository and navigate into it
+   ```bash
+   git clone https://github.com/SimplyPrint/printer-nebula-firmware
+   cd printer-nebula-firmware
+    ```
+2. Set the firmware version with the `CREALITY_VERSION` variable and run the script:
+    ```bash
+    export CREALITY_VERSION=1.1.0.29
+    ./create.sh
+    ```
+    The `ROOT_PASSWORD` variable defines the password for the root user, and defaults to `creality`.
