@@ -21,9 +21,12 @@ jobs:
     - name: Check firmware version
       id: check_version
       run: |
-        python -m pip install -r requirements.txt
-        VERSION=$(python get-version.py)
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        output=$(python get-version.py)
+        version=$(echo "$output" | sed -n '1p')
+        url=$(echo "$output" | sed -n '2p')
+        echo "VERSION=$version" >> $GITHUB_ENV
+        echo "DOWNLOAD_URL=$url" >> $GITHUB_ENV
+        
         echo "Found version: $VERSION"
 
     - name: Check if release exists

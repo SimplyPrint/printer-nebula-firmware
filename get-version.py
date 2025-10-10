@@ -45,3 +45,4 @@ if not firmware_versions:
 
 latest_ver = sorted(firmware_versions.keys())[-1]
 print(latest_ver)
+print(firmware_versions[latest_ver])

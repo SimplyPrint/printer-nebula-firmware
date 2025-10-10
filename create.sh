@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd -P)"
 
@@ -18,6 +18,10 @@ ROOT_PASSWORD=creality
 if [ -z ${CREALITY_VERSION+x} ]; then
   echo "CREALITY_VERSION isn't set"
   exit 1
+fi;
+if [ -z ${DOWNLOAD_URL+x} ]; then
+    echo "DOWNLOAD_URL isn't set"
+    exit 1
 fi;
 
 # thanks to Neon for showing me how to derive the password
@@ -46,7 +50,7 @@ function write_ota_info() {
 function customise_rootfs() {
     write_ota_info
     sudo cp $CURRENT_DIR/etc/init.d/* /tmp/${version}-simplyprint/squashfs-root/etc/init.d/
-    sudo sed -i "/^root/c\\$(printf '%s\n' "$ROOT_HASH")"  /tmp/${version}-simplyprint/squashfs-root/etc/shadow
+    sudo sed -i "s|^\(root:\)[^:]*|\1$ROOT_HASH|"  /tmp/${version}-simplyprint/squashfs-root/etc/shadow
     sudo cp $CURRENT_DIR/root/* /tmp/${version}-simplyprint/squashfs-root/root/
 }
 
@@ -59,8 +63,7 @@ function update_rootfs() {
     sudo chown $USER rootfs.squashfs 
 }
 
-download=$(wget -q https://www.creality.com/pages/${DOWNLOAD_PAGE} -O- | grep -o  "\"\(.*\)V${CREALITY_VERSION}.img\"" | head -1 | tr -d '"')
-old_image_name=$(basename $download)
+old_image_name=$(basename $DOWNLOAD_URL)
 board_name=$(echo "$old_image_name" | grep -o '^[^_]*')
 old_directory="${board_name}_ota_img_V${CREALITY_VERSION}"
 old_sub_directory="ota_v${CREALITY_VERSION}"
@@ -69,8 +72,8 @@ sub_directory="ota_v${version}"
 image_name="${board_name}_ota_img_V${version}".img
 
 if [ ! -f /tmp/$old_image_name ]; then
-    echo "Downloading $download -> /tmp/$old_image_name ..."
-    wget "$download" -O /tmp/$old_image_name
+    echo "Downloading ${DOWNLOAD_URL} -> /tmp/$old_image_name ..."
+    wget "${DOWNLOAD_URL}" -O /tmp/$old_image_name
 fi
 
 if [ -d /tmp/$old_directory ]; then
