@@ -1,6 +1,6 @@
 #!/bin/sh
 
-FLAG_FILE="/tmp/udisk/sda1/emergency_factory_reset"
+FLAG_FILE="/tmp/udisk/sda1/factory_reset"
 
 factory_reset() {
     mv "$FLAG_FILE" "${FLAG_FILE}.old" >/dev/null 2>&1
@@ -34,7 +34,7 @@ case "$1" in
 			echo "Info: Executing factory reset..."
 			factory_reset
 		else
-            echo "Info: No 'emergency_factory_reset' file found on the USB drive!"
+            echo "Info: No 'factory_reset' file found on the USB drive!"
             exit 1
 		fi
         ;;
