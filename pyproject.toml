@@ -1,0 +1,10 @@
+[project]
+name = "printer-nebula-firmware"
+version = "0.1.1"
+description = "Automates fetching the latest Creality Nebula firmware, rooting it, and repacking it into a new image."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4>=4.14.3",
+    "requests>=2.32.5",
+]
