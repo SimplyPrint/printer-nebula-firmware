@@ -98,7 +98,6 @@ python3
        on [Creality's website](https://www.creality.com/download/creality-nebula-smart-kit).
     2. Run `get-version.py` to fetch the newest firmware version and download link.
    ```bash
-   uv sync
    uv run get-version.py
    ```
 3. Set the firmware version and download link variables.
