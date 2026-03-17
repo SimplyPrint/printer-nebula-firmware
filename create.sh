@@ -136,7 +136,7 @@ cp "/tmp/$old_directory/$old_sub_directory"/zero.bin.* "/tmp/${version}-simplypr
 cp "/tmp/$old_directory/$old_sub_directory"/xImage.* "/tmp/${version}-simplyprint/$directory/$sub_directory/"
 
 pushd "/tmp/${version}-simplyprint/$directory/$sub_directory" > /dev/null || exit $?
-split -d -b 1048576 -a 4 "/tmp/${version}-simplyprint/rootfs.squashfs rootfs.squashfs."
+split -d -b 1048576 -a 4 "/tmp/${version}-simplyprint/rootfs.squashfs" "rootfs.squashfs."
 popd > /dev/null || exit $?
 
 part_md5=
