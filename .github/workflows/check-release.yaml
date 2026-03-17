@@ -31,10 +31,18 @@ jobs:
           echo "Found version: $VERSION"
           echo "With url: $URL"
 
+      - name: Get SP version
+        id: sp_version
+        run: |
+          SP_VERSION=$(grep -Po '(?<=^version = ")[^"]+' pyproject.toml)
+          echo "version=$SP_VERSION" >> $GITHUB_OUTPUT
+          echo "SP version: $SP_VERSION"
+
       - name: Check if release exists
         id: check_release
         run: |
-          if gh release view "V${{ steps.check_version.outputs.version }}" >/dev/null 2>&1; then
+          TAG="SP_v${{ steps.sp_version.outputs.version }}_V${{ steps.check_version.outputs.version }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
             echo "exists=true" >> $GITHUB_OUTPUT
           else
             echo "exists=false" >> $GITHUB_OUTPUT
@@ -54,10 +62,14 @@ jobs:
           ./create.sh
           
           # Create release
-          FIRMWARE_FILE="NEBULA_ota_img_V6.${{ steps.check_version.outputs.version }}.img"
-          gh release create "V${{ steps.check_version.outputs.version }}" \
-            --title "Firmware V${{ steps.check_version.outputs.version }}" \
-            --notes "Firmware version ${{ steps.check_version.outputs.version }}" \
+          SP_VERSION="${{ steps.sp_version.outputs.version }}"
+          CREALITY_VERSION="${{ steps.check_version.outputs.version }}"
+          FIRMWARE_FILE="SP_v${SP_VERSION}_NEBULA_ota_img_V6.${CREALITY_VERSION}.img"
+          TAG="SP_v${SP_VERSION}_V${CREALITY_VERSION}"
+          gh release create "$TAG" \
+            --draft \
+            --title "SP v${SP_VERSION} - Firmware V${CREALITY_VERSION}" \
+            --notes "Firmware version ${CREALITY_VERSION}" \
             "$FIRMWARE_FILE"
         env:
           CREALITY_VERSION: ${{ steps.check_version.outputs.version }}

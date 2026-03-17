@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+SP_VERSION="0.1.1"
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd -P)"
 
@@ -160,5 +162,5 @@ sed -i "s/img_size=$orig_rootfs_size/img_size=$rootfs_size/g" "/tmp/${version}-s
 
 pushd "/tmp/${version}-simplyprint/" > /dev/null || exit $?
 7z a "${image_name}.7z" -p"$FIRMWARE_PASSWORD" "$directory"
-mv "${image_name}.7z" "${CURRENT_DIR}/${image_name}"
+mv "${image_name}.7z" "${CURRENT_DIR}/SP_v${SP_VERSION}_${image_name}"
 popd > /dev/null || exit $?
