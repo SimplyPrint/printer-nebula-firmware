@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SP_VERSION="0.1.1"
+SP_VERSION="0.1.2"
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd -P)"
 
