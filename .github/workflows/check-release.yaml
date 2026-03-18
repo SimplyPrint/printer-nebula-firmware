@@ -67,7 +67,6 @@ jobs:
           FIRMWARE_FILE="SP_v${SP_VERSION}_NEBULA_ota_img_V6.${CREALITY_VERSION}.img"
           TAG="SP_v${SP_VERSION}_V${CREALITY_VERSION}"
           gh release create "$TAG" \
-            --draft \
             --title "SP v${SP_VERSION} - Firmware V${CREALITY_VERSION}" \
             --notes "Firmware version ${CREALITY_VERSION}" \
             "$FIRMWARE_FILE"
